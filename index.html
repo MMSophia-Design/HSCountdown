@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Harry Styles: Together, Together — MSG Countdown</title>
+<title>Harry Styles MSG Concert Countdown</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -652,6 +652,33 @@ document.getElementById('shareLinkBtn').addEventListener('click', function() {
   if (!isNaN(d) && d >= 0 && d < N) selectDate(d);
 })();
 
+// ── Native share (mobile / supported browsers) ──
+document.getElementById('nativeShareBtn').addEventListener('click', function () {
+  var shareUrl = window.location.href.split('?')[0] + '?date=' + selIdx;
+  var labelEl = document.getElementById('nativeShareLabel');
+  if (navigator.share) {
+    navigator.share({
+      title: 'Harry Styles MSG Concert Countdown',
+      text: 'Pick your MSG show and count down with me.',
+      url: shareUrl
+    }).then(function () {
+      if (labelEl) labelEl.textContent = 'Shared!';
+      setTimeout(function () {
+        if (labelEl) labelEl.textContent = 'Share with friends';
+      }, 2000);
+    }).catch(function () {
+      // If user cancels, silently ignore
+    });
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(shareUrl).then(function () {
+      if (labelEl) labelEl.textContent = 'Link copied';
+      setTimeout(function () {
+        if (labelEl) labelEl.textContent = 'Share with friends';
+      }, 2000);
+    });
+  }
+});
+
 // ── Add to calendar (.ics) ──
 document.getElementById('calBtn').addEventListener('click', function() {
   var date = DATES[selIdx];
@@ -671,8 +698,8 @@ document.getElementById('calBtn').addEventListener('click', function() {
     'BEGIN:VEVENT',
     'DTSTART:' + fmt(dt),
     'DTEND:'   + fmt(end),
-    'SUMMARY:Harry Styles: Together\\, Together',
-    'DESCRIPTION:Harry Styles at Madison Square Garden. KATTDO Concert Countdown.',
+    'SUMMARY:Harry Styles MSG Concert Countdown',
+    'DESCRIPTION:Harry Styles at Madison Square Garden. KATTDO fan-made concert countdown site.',
     'LOCATION:Madison Square Garden\\, New York\\, NY',
     'END:VEVENT',
     'END:VCALENDAR'
