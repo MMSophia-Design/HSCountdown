@@ -645,15 +645,62 @@ drawWheel();
 tick();
 setInterval(tick,1000);
 
-// ── Share link ──
+function baseUrlWithDateParam(idx) {
+  try {
+    var u = new URL(window.location.href);
+    u.search = '';
+    u.hash = '';
+    u.searchParams.set('date', String(idx));
+    return u.toString();
+  } catch (e) {
+    return window.location.href.split('?')[0] + '?date=' + idx;
+  }
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+  return new Promise(function (resolve, reject) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      ta.style.top = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      ok ? resolve() : reject(new Error('execCommand copy failed'));
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+function showTempLabel(labelEl, text, ms, fallbackText) {
+  if (!labelEl) return;
+  var prev = fallbackText || labelEl.textContent;
+  labelEl.textContent = text;
+  setTimeout(function () { labelEl.textContent = prev; }, ms || 2000);
+}
+
+// ── Copy link ──
 document.getElementById('shareLinkBtn').addEventListener('click', function() {
-  var url = window.location.href.split('?')[0] + '?date=' + selIdx;
-  navigator.clipboard.writeText(url).then(function() {
-    var btn = document.getElementById('shareLinkBtn');
-    var lbl = document.getElementById('shareLinkLabel');
-    btn.classList.add('copied');
-    lbl.textContent = 'Copied!';
-    setTimeout(function(){ btn.classList.remove('copied'); lbl.textContent = 'Copy link'; }, 2000);
+  var url = baseUrlWithDateParam(selIdx);
+  var btn = document.getElementById('shareLinkBtn');
+  var lbl = document.getElementById('shareLinkLabel');
+
+  copyToClipboard(url).then(function () {
+    if (btn) btn.classList.add('copied');
+    if (lbl) lbl.textContent = 'Copied!';
+    setTimeout(function(){ if (btn) btn.classList.remove('copied'); if (lbl) lbl.textContent = 'Copy link'; }, 2000);
+  }).catch(function () {
+    try { window.prompt('Copy this link:', url); } catch (e) {}
+    if (lbl) showTempLabel(lbl, 'Copy manually', 2200, 'Copy link');
   });
 });
 
@@ -666,7 +713,7 @@ document.getElementById('shareLinkBtn').addEventListener('click', function() {
 
 // ── Native share (mobile / supported browsers) ──
 document.getElementById('nativeShareBtn').addEventListener('click', function () {
-  var shareUrl = window.location.href.split('?')[0] + '?date=' + selIdx;
+  var shareUrl = baseUrlWithDateParam(selIdx);
   var labelEl = document.getElementById('nativeShareLabel');
   if (navigator.share) {
     navigator.share({
@@ -681,12 +728,12 @@ document.getElementById('nativeShareBtn').addEventListener('click', function () 
     }).catch(function () {
       // If user cancels, silently ignore
     });
-  } else if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(shareUrl).then(function () {
-      if (labelEl) labelEl.textContent = 'Link copied';
-      setTimeout(function () {
-        if (labelEl) labelEl.textContent = 'Share with friends';
-      }, 2000);
+  } else {
+    copyToClipboard(shareUrl).then(function () {
+      if (labelEl) showTempLabel(labelEl, 'Link copied', 2000, 'Share with friends');
+    }).catch(function () {
+      try { window.prompt('Copy this link:', shareUrl); } catch (e) {}
+      if (labelEl) showTempLabel(labelEl, 'Copy manually', 2200, 'Share with friends');
     });
   }
 });
