@@ -371,6 +371,7 @@ var DATES = [
 ];
 var N = DATES.length;
 var selIdx = 0;
+var hoverIdx = -1;
 var concertDone = false;
 
 // Cursor
@@ -468,13 +469,19 @@ function drawWheel(){
   // Inner date slices
   for(var i=0;i<N;i++){
     var a0=offset+i*slice, a1=a0+slice, aMid=(a0+a1)/2;
-    var isSel=(i===selIdx), isPink=(i%2===0);
+    var isSel=(i===selIdx), isHover=(i===hoverIdx), isPink=(i%2===0);
     wctx.beginPath();
     wctx.moveTo(WCX+R_IN*Math.cos(a0),WCY+R_IN*Math.sin(a0));
     wctx.arc(WCX,WCY,R_OUT,a0,a1);
     wctx.arc(WCX,WCY,R_IN,a1,a0,true);
     wctx.closePath();
-    wctx.fillStyle=isSel?(isPink?'#FF2D78':'#00D4FF'):(isPink?'rgba(255,45,120,0.22)':'rgba(0,212,255,0.22)');
+    if (isSel) {
+      wctx.fillStyle = isPink ? '#FF2D78' : '#00D4FF';
+    } else if (isHover) {
+      wctx.fillStyle = isPink ? 'rgba(255,45,120,0.32)' : 'rgba(0,212,255,0.32)';
+    } else {
+      wctx.fillStyle = isPink ? 'rgba(255,45,120,0.22)' : 'rgba(0,212,255,0.22)';
+    }
     wctx.fill();
     // separator
     wctx.beginPath();
@@ -604,6 +611,35 @@ wc.addEventListener('click',function(e){
   var norm=((angle+Math.PI/2)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
   var idx=Math.floor(norm/((2*Math.PI)/N));
   if(idx>=0&&idx<N)selectDate(idx);
+});
+
+wc.addEventListener('mousemove', function (e) {
+  var rect = wc.getBoundingClientRect();
+  var scale = WW / rect.width;
+  var mx = (e.clientX - rect.left) * scale - WCX;
+  var my = (e.clientY - rect.top) * scale - WCY;
+  var dist = Math.sqrt(mx * mx + my * my);
+  if (dist < R_IN || dist > R_BAND_OUT) {
+    if (hoverIdx !== -1) {
+      hoverIdx = -1;
+      drawWheel();
+    }
+    return;
+  }
+  var angle = Math.atan2(my, mx);
+  var norm = ((angle + Math.PI / 2) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+  var idx = Math.floor(norm / ((2 * Math.PI) / N));
+  if (idx !== hoverIdx && idx >= 0 && idx < N) {
+    hoverIdx = idx;
+    drawWheel();
+  }
+});
+
+wc.addEventListener('mouseleave', function () {
+  if (hoverIdx !== -1) {
+    hoverIdx = -1;
+    drawWheel();
+  }
 });
 
 dsel.addEventListener('change',function(){selectDate(+dsel.value);});
