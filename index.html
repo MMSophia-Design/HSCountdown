@@ -156,32 +156,28 @@
   .footer-link:hover { color: var(--cyan); }
 
   .consent-banner {
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 12px;
-    z-index: 9000;
+    position: relative;
+    z-index: 110;
     background: rgba(15,9,32,0.96);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 12px;
-    padding: 12px;
-    width: min(680px, calc(100vw - 24px));
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding: 10px;
+    width: 100%;
     display: none;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     flex-wrap: wrap;
   }
   .consent-banner.show { display: flex; }
-  .consent-text { font-size: 11px; line-height: 1.4; color: rgba(255,255,255,0.9); letter-spacing: 0.3px; }
+  .consent-text { font-size: 10px; line-height: 1.35; color: rgba(255,255,255,0.9); letter-spacing: 0.2px; }
   .consent-actions { display: flex; gap: 8px; }
   .consent-btn {
     border: 1px solid rgba(255,255,255,0.22);
     background: transparent;
     color: white;
     border-radius: 999px;
-    font-size: 11px;
-    padding: 7px 12px;
+    font-size: 10px;
+    padding: 6px 10px;
     cursor: pointer;
   }
   .consent-btn.accept {
@@ -286,6 +282,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
+
+<div class="consent-banner" id="consentBanner" role="dialog" aria-live="polite" aria-label="Cookie consent">
+  <div class="consent-text">
+    This site uses Google Analytics to understand visit traffic.
+    <a class="footer-link" href="privacy.html">Learn more</a>.
+  </div>
+  <div class="consent-actions">
+    <button class="consent-btn" id="declineAnalyticsBtn" type="button">Decline</button>
+    <button class="consent-btn accept" id="acceptAnalyticsBtn" type="button">Accept</button>
+  </div>
+</div>
 
 <div class="disclaimer-banner" role="note">This is a personal project for fun and is not affiliated with Harry Styles, HSHQ, or Madison Square Garden in any way.</div>
 
@@ -400,17 +407,6 @@
   Counting down until we're together &middot; Not affiliated with Harry Styles or his team &middot;
   <a class="footer-link" href="privacy.html">Privacy</a> &middot; &copy; 2026 MixedMediaSophia
 </footer>
-
-<div class="consent-banner" id="consentBanner" role="dialog" aria-live="polite" aria-label="Cookie consent">
-  <div class="consent-text">
-    This site uses Google Analytics to understand visit traffic.
-    <a class="footer-link" href="privacy.html">Learn more</a>.
-  </div>
-  <div class="consent-actions">
-    <button class="consent-btn" id="declineAnalyticsBtn" type="button">Decline</button>
-    <button class="consent-btn accept" id="acceptAnalyticsBtn" type="button">Accept</button>
-  </div>
-</div>
 
 <script>
 var CONFETTI_COLORS = ['#FF2D78','#00D4FF','#FFD166','#ffffff','#cc88ff'];
