@@ -157,14 +157,15 @@
 
   .consent-banner {
     position: fixed;
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 12px;
     z-index: 9000;
     background: rgba(15,9,32,0.96);
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 12px;
     padding: 12px;
+    width: min(680px, calc(100vw - 24px));
     display: none;
     gap: 10px;
     align-items: center;
